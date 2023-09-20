@@ -15,6 +15,7 @@ app.post('/api', (req,res) => { // cria um arquivo com o nome do email do body, 
     })
     })
 
+    
 app.get('/api/:email', (req, res) => {
     fs.readFile(`${req.params.email}.json`, (err, data) => {
         const dados = JSON.parse(data)

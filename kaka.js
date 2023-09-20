@@ -1,45 +1,40 @@
 const express = require("express")
-const fs= require("fs")
+const fs = require("fs")
 const app = express()
-app.use(express.urlencoded({extended:true}))
+app.use(express.json())
 
 
-app.set('view engine', 'ejs')
+app.post('/api', (req,res) => { // cria um arquivo com o nome do email do body, e converte para json
+    const salvar = JSON.stringify(req.body)
+    fs.writeFile(`${req.body.email}.json`, salvar, (err) =>{
+        if(err){
+            res.send({message: 'err'})
+        }
+        res.send({mensagem: "seus dados foram salvos!"})
+    })
+    })
 
-app.get('/', function(req, res) {
-res.render('form')
-})
-app.post('/home', function(req,res){
-const salvar = JSON.stringify(req.body)
-fs.writeFileSync(`${req.body.email}.json`, salvar, (err) =>{
-if(err){
-console.log(err);
-}
-} )
-res.render('form1')
-
-})
-app.get('/lista', function(req, res) {
-fs.readdir(__dirname, (err,files)=>{
-var dados = files.filter(file => file.includes('@') && file.includes('.json'))
-res.render('lista', {dados: dados})
-
-})
-})
-app.get('/dados/:email', (req,res)=>{
-var dados = req.params
-var dadosfinais = JSON.parse(fs.readFileSync(dados.email))
-console.log(dadosfinais);
-res.render("usuario", {dados: dadosfinais})
-})
-app.get('/apagar/:email', (req,res)=>{
-var dados = req.params
-if (fs.existsSync(dados.email)){
-fs.rmSync(dados.email)
-}
-res.redirect('/lista')
+app.get('/api/:email', (req, res) => {
+    fs.readFile(`${req.params.email}.json`, (err, data) => {
+        const dados = JSON.parse(data)
+        res.send({message:"seus dados", dados})
+    })
 })
 
+app.put('/api/:email', (req, res) => {
+    const salvar = JSON.stringify(req.body)
+        fs.writeFileSync(`${req.params.email}.json`, salvar, {flag: 'w'})
+        res.send({mensagem: "seus dados foram salvos!"})
+    })
+
+app.delete('/api/:email', (req, res) => {
+    fs.unlinkSync(req.params.email)
+    res.send({message: "Conta deletada com sucesso!"})
+})
+
+app.use((req, res) => {
+    res.send({err: 'error 404', message: "Rota Inválida!"})
+})
 
 app.listen(8080, () =>{
 console.log("Funnfou")

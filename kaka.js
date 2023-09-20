@@ -1,6 +1,7 @@
 const express = require("express")
 const fs = require("fs")
 const app = express()
+const PORT = 8080
 app.use(express.json())
 
 
@@ -36,6 +37,6 @@ app.use((req, res) => {
     res.send({err: 'error 404', message: "Rota Inválida!"})
 })
 
-app.listen(8080, () =>{
-console.log("Funnfou")
+app.listen(PORT, () =>{
+console.log(`Server rodando a Porta ${PORT}`)
 })
